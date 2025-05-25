@@ -1,0 +1,59 @@
+// main.go
+package main
+
+import (
+    "log"
+    "github.com/gin-gonic/gin"
+
+    "github.com/rlee603166/circl/internal/db"
+    "github.com/rlee603166/circl/internal/config"
+    "github.com/rlee603166/circl/internal/middleware"
+
+    "github.com/rlee603166/circl/modules/auth"
+    "github.com/rlee603166/circl/modules/user"
+    "github.com/rlee603166/circl/modules/education"
+    "github.com/rlee603166/circl/modules/experience"
+
+)
+
+func main() {
+    dbURL, port := config.Load()
+    conn, err := db.Connect(dbURL)
+    if err != nil {
+        log.Fatalf("DB connection error: %v", err)
+    }
+
+    r := gin.Default()
+    r.Use(middleware.CORS())
+
+    r.GET("/", func(c *gin.Context) {
+        c.JSON(200, gin.H{"message": "BREAK EVERYTHING!"})
+    })
+
+    // // auth module
+    // authSvc := auth.NewService()
+    // auth.RegisterRoutes(r, authSvc)
+
+    jwtSvc := auth.GetJWTService()
+
+    secured := r.Group("/api/v1", middleware.SecureHandler(jwtSvc))
+
+    // User module
+    uRepo := user.NewRepository(conn)
+    uSvc := user.NewService(uRepo)
+
+    // Experience module
+    expRepo := experience.NewRepository(conn)
+    expSvc := experience.NewService(expRepo)
+
+    // Education module
+    edRepo := education.NewRepository(conn)
+    edSvc := education.NewService(edRepo)
+
+
+    user.RegisterRoutes(secured, uSvc)
+    experience.RegisterRoutes(secured, expSvc)
+    education.RegisterRoutes(secured, edSvc)
+
+    r.Run(port)
+}
