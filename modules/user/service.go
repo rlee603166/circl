@@ -19,18 +19,24 @@ func NewService(r *Repository) *Service {
 
 // CreateUser validates input, hashes the password, and stores the user.
 func (s *Service) CreateUser(u *User) (*User, error) {
-    if u.Email == "" || u.HashedPassword == "" {
+    if u.Email == nil || u.HashedPassword == nil || *u.Email == "" || *u.HashedPassword == "" {
         return nil, errors.New("email and password are required")
     }
+
     u.UserID = uuid.New().String()
-    hash, err := bcrypt.GenerateFromPassword([]byte(u.HashedPassword), bcrypt.DefaultCost)
+
+    hash, err := bcrypt.GenerateFromPassword([]byte(*u.HashedPassword), bcrypt.DefaultCost)
     if err != nil {
         return nil, err
     }
-    u.HashedPassword = string(hash)
+
+    hashed := string(hash)
+    u.HashedPassword = &hashed
+
     if err := s.repo.Create(u); err != nil {
         return nil, err
     }
+
     return u, nil
 }
 

@@ -30,13 +30,9 @@ func main() {
         c.JSON(200, gin.H{"message": "BREAK EVERYTHING!"})
     })
 
-    // // auth module
-    // authSvc := auth.NewService()
-    // auth.RegisterRoutes(r, authSvc)
 
-    jwtSvc := auth.GetService()
-
-    secured := r.Group("/api/v1", middleware.SecureHandler(jwtSvc))
+    authSvc := auth.GetService()
+    secured := r.Group("/api/v1", middleware.SecureHandler(authSvc))
 
     // User module
     uRepo := user.NewRepository(conn)
@@ -51,6 +47,7 @@ func main() {
     edSvc := education.NewService(edRepo)
 
 
+    auth.RegisterRoutes(r, authSvc, uSvc)
     user.RegisterRoutes(secured, uSvc)
     experience.RegisterRoutes(secured, expSvc)
     education.RegisterRoutes(secured, edSvc)

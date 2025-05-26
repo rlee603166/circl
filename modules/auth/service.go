@@ -8,30 +8,36 @@ import (
  
     "github.com/golang-jwt/jwt/v5"
     "google.golang.org/api/idtoken"
+    "github.com/rlee603166/circl/modules/user"
 )
 
 type Service struct {
-    secretKey []byte
-    googleClientID string
+    secretAccessKey     []byte
+    secretRefreshKey    []byte
+    googleClientID      string
 }
 
 func GetService() *Service {
-    secretKey := os.Getenv("JWT_SECRET")
-    googleClientID := os.Getenv("GOOGLE_ClIENT_ID")
+    secretAccessKey     := os.Getenv("JWT_ACCESS_SECRET")
+    secretRefreshKey    := os.Getenv("JWT_REFRESH_SECRET")
+    googleClientID      := os.Getenv("GOOGLE_ClIENT_ID")
+
     return &Service{
-        secretKey:      []byte(secretKey),
-        googleClientID: googleClientID,
+        secretAccessKey:    []byte(secretAccessKey),
+        secretRefreshKey:   []byte(secretRefreshKey),
+        googleClientID:     googleClientID,
     }
 }
 
-func (s *Service) CreateToken(email string) (string, error) {
+func (s *Service) CreateAccessToken(u *user.User) (string, error) {
     token := jwt.NewWithClaims(jwt.SigningMethodHS256,
         jwt.MapClaims{
-            "email": email,
+            "userID": u.UserID,
+            "email": u.Email,
             "exp": time.Now().Add(time.Hour * 24).Unix(),
         })
 
-    tokenString, err := token.SignedString(s.secretKey)
+    tokenString, err := token.SignedString(s.secretAccessKey)
     if err != nil {
         return "", err
     }
@@ -39,26 +45,99 @@ func (s *Service) CreateToken(email string) (string, error) {
     return tokenString, nil
 }
 
-func (s *Service) VerifyToken(tokenString string) (jwt.MapClaims, error) {
+func (s *Service) CreateRefreshToken(u *user.User) (string, error) {
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256,
+        jwt.MapClaims{
+            "userID": u.UserID,
+            "email": u.Email,
+            "exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+        })
+
+    tokenString, err := token.SignedString(s.secretRefreshKey)
+    if err != nil {
+        return "", err
+    }
+
+    return tokenString, nil
+}
+
+func (s *Service) VerifyAccessToken(tokenString string) (*TokenPayload, error) {
     token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
         if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
             return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
         }
-        return s.secretKey, nil
+        return s.secretAccessKey, nil
     })
 
     if err != nil {
         return nil, err
     }
 
-    if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-        return claims, nil
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if !ok || !token.Valid {
+        return nil, fmt.Errorf("invalid token")
     }
 
-    return nil, fmt.Errorf("invalid token")
+    expRaw, ok := claims["exp"]
+    if !ok {
+        return nil, fmt.Errorf("missing exp claim")
+    }
+
+    expFloat, ok := expRaw.(float64)
+    if !ok {
+        return nil, fmt.Errorf("invalid exp claim")
+    }
+
+    if int64(expFloat) < time.Now().Unix() {
+        return nil, fmt.Errorf("token expired")
+
+    }
+
+    return &TokenPayload{
+        UserID: getStringClaim(claims, "userID"),
+        Email:  getStringClaim(claims, "email"),
+    }, nil
 }
 
-func (s *Service) VerifyGoogleToken(tokenString string) (*AuthPayload, error) {
+func (s *Service) VerifyRefreshToken(tokenString string) (*TokenPayload, error) {
+    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+            return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+        }
+        return s.secretRefreshKey, nil
+    })
+
+    if err != nil {
+        return nil, err
+    }
+
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if !ok || !token.Valid {
+        return nil, fmt.Errorf("invalid token")
+    }
+
+    expRaw, ok := claims["exp"]
+    if !ok {
+        return nil, fmt.Errorf("missing exp claim")
+    }
+
+    expFloat, ok := expRaw.(float64)
+    if !ok {
+        return nil, fmt.Errorf("invalid exp claim")
+    }
+
+    if int64(expFloat) < time.Now().Unix() {
+        return nil, fmt.Errorf("token expired")
+
+    }
+
+    return &TokenPayload{
+        UserID: getStringClaim(claims, "userID"),
+        Email:  getStringClaim(claims, "email"),
+    }, nil
+}
+
+func (s *Service) VerifyGoogleToken(tokenString string) (*GooglePayload, error) {
     payload, err := idtoken.Validate(context.Background(), tokenString, s.googleClientID)
     if err != nil {
         return nil, fmt.Errorf("token validation failed: %w", err)
@@ -66,7 +145,7 @@ func (s *Service) VerifyGoogleToken(tokenString string) (*AuthPayload, error) {
 
     claims := payload.Claims
 
-    return &AuthPayload{
+    return &GooglePayload{
         FirstName:  getStringClaim(claims, "given_name"),
         LastName:   getStringClaim(claims, "family_name"),
         Email:      getStringClaim(claims, "email"),
@@ -79,6 +158,5 @@ func getStringClaim(claims map[string]interface{}, key string) string {
             return str
         }
     }
-
     return ""
 }

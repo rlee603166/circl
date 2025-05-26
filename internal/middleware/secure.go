@@ -9,7 +9,7 @@ import (
 )
 
 
-func SecureHandler(s *auth.Service) gin.HandlerFunc {
+func SecureHandler(authSvc *auth.Service) gin.HandlerFunc {
 
     return func(c *gin.Context) {
         authHeader := c.GetHeader("Authorization")
@@ -18,20 +18,15 @@ func SecureHandler(s *auth.Service) gin.HandlerFunc {
             return
         }
         
-        idToken := strings.TrimPrefix(authHeader, "Bearer ")
-        claims, err := s.VerifyToken(idToken)
-        if err != nil {
-            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or malformed token"})
+        accessToken := strings.TrimPrefix(authHeader, "Bearer ")
+        tokenPayload, err := authSvc.VerifyAccessToken(accessToken)
+        if err != nil  {
+            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid access token"})
             return
         }
 
-        username, ok := claims["username"].(string)
-        if !ok {
-            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or malformed token"})
-            return
-        }
-
-        c.Set("username", username)
+        c.Set("userID", tokenPayload.UserID)
+        c.Set("email", tokenPayload.Email)
         c.Next()
     }
 }

@@ -2,6 +2,7 @@
 package user
 
 import (
+    "fmt"
     "github.com/jmoiron/sqlx"
 )
 
@@ -38,8 +39,9 @@ func (r *Repository) GetByID(id string) (*User, error) {
 // GetByEmail fetches a user by their Email.
 func (r *Repository) GetByEmail(email string) (*User, error) {
     var u User
-    err := r.db.Get(&u, `SELECT * FROM users where email=$1`, email)
+    err := r.db.Get(&u, `SELECT * FROM users WHERE email=$1`, email)
     if err != nil {
+        fmt.Print(err)
         return nil, err
     }
 
