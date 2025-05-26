@@ -34,7 +34,7 @@ func main() {
     // authSvc := auth.NewService()
     // auth.RegisterRoutes(r, authSvc)
 
-    jwtSvc := auth.GetJWTService()
+    jwtSvc := auth.GetService()
 
     secured := r.Group("/api/v1", middleware.SecureHandler(jwtSvc))
 

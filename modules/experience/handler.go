@@ -8,8 +8,8 @@ import (
     "github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(r *gin.RouterGroup, svc *Service) {
-    r.POST("/users/:id/experiences", func(c *gin.Context) {
+func RegisterRoutes(rg *gin.RouterGroup, svc *Service) {
+    rg.POST("/users/:id/experiences", func(c *gin.Context) {
         var e Experience
         if err := c.ShouldBindJSON(&e); err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -24,7 +24,7 @@ func RegisterRoutes(r *gin.RouterGroup, svc *Service) {
         c.JSON(http.StatusCreated, created)
     })
 
-    r.GET("/users/:id/experiences", func(c *gin.Context) {
+    rg.GET("/users/:id/experiences", func(c *gin.Context) {
         list, err := svc.GetExperiencesByUserID(c.Param("id"))
         if err != nil {
             c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -33,7 +33,7 @@ func RegisterRoutes(r *gin.RouterGroup, svc *Service) {
         c.JSON(http.StatusOK, list)
     })
 
-    r.PUT("/experiences/:id", func(c *gin.Context) {
+    rg.PUT("/experiences/:id", func(c *gin.Context) {
         id, _ := strconv.Atoi(c.Param("id"))
         var e Experience
         if err := c.ShouldBindJSON(&e); err != nil {
@@ -49,7 +49,7 @@ func RegisterRoutes(r *gin.RouterGroup, svc *Service) {
         c.JSON(http.StatusOK, updated)
     })
 
-    r.DELETE("/experiences/:id", func(c *gin.Context) {
+    rg.DELETE("/experiences/:id", func(c *gin.Context) {
         id, _ := strconv.Atoi(c.Param("id"))
         if err := svc.DeleteExperience(id); err != nil {
             c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

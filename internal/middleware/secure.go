@@ -9,7 +9,7 @@ import (
 )
 
 
-func SecureHandler(s *auth.JWTService) gin.HandlerFunc {
+func SecureHandler(s *auth.Service) gin.HandlerFunc {
 
     return func(c *gin.Context) {
         authHeader := c.GetHeader("Authorization")

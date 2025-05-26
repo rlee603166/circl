@@ -7,8 +7,8 @@ import (
 )
 
 // RegisterRoutes binds the user endpoints to Gin.
-func RegisterRoutes(r *gin.RouterGroup, svc *Service) {
-    r.POST("/users", func(c *gin.Context) {
+func RegisterRoutes(rg *gin.RouterGroup, svc *Service) {
+    rg.POST("/users", func(c *gin.Context) {
         var u User
         if err := c.ShouldBindJSON(&u); err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -22,7 +22,7 @@ func RegisterRoutes(r *gin.RouterGroup, svc *Service) {
         c.JSON(http.StatusCreated, created)
     })
 
-    r.GET("/users/:id", func(c *gin.Context) {
+    rg.GET("/users/:id", func(c *gin.Context) {
         id := c.Param("id")
         u, err := svc.GetUserByID(id)
         if err != nil {

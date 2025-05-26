@@ -20,6 +20,7 @@ func (r *Repository) Create(u *User) error {
     query := `INSERT INTO users (user_id, first_name, last_name, email, hashed_password, summary, pfp_url)
               VALUES (:user_id, :first_name, :last_name, :email, :hashed_password, :summary, :pfp_url)`
     _, err := r.db.NamedExec(query, u)
+
     return err
 }
 
@@ -30,5 +31,17 @@ func (r *Repository) GetByID(id string) (*User, error) {
     if err != nil {
         return nil, err
     }
+
+    return &u, nil
+}
+
+// GetByEmail fetches a user by their Email.
+func (r *Repository) GetByEmail(email string) (*User, error) {
+    var u User
+    err := r.db.Get(&u, `SELECT * FROM users where email=$1`, email)
+    if err != nil {
+        return nil, err
+    }
+
     return &u, nil
 }

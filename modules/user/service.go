@@ -38,3 +38,8 @@ func (s *Service) CreateUser(u *User) (*User, error) {
 func (s *Service) GetUserByID(id string) (*User, error) {
     return s.repo.GetByID(id)
 }
+
+// GetUserByEmail retrieves a user by Email.
+func (s *Service) GetUserByEmail(email string) (*User, error) {
+    return s.repo.GetByEmail(email)
+}
