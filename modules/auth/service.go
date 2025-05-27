@@ -149,14 +149,15 @@ func (s *Service) VerifyGoogleToken(tokenString string) (*GooglePayload, error) 
         FirstName:  getStringClaim(claims, "given_name"),
         LastName:   getStringClaim(claims, "family_name"),
         Email:      getStringClaim(claims, "email"),
+        PfpURL:     getStringClaim(claims, "picture"),
     }, nil
 }
 
-func getStringClaim(claims map[string]interface{}, key string) string {
+func getStringClaim(claims jwt.MapClaims, key string) *string {
     if val, ok := claims[key]; ok {
         if str, ok := val.(string); ok {
-            return str
+            return &str
         }
     }
-    return ""
+    return nil
 }

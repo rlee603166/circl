@@ -40,6 +40,21 @@ func (s *Service) CreateUser(u *User) (*User, error) {
     return u, nil
 }
 
+// CreateUser validates input, hashes the password, and stores the user.
+func (s *Service) CreateGoogleUser(u *User) (*User, error) {
+    if u.Email == nil ||*u.Email == "" {
+        return nil, errors.New("email and password are required")
+    }
+
+    u.UserID = uuid.New().String()
+
+    if err := s.repo.Create(u); err != nil {
+        return nil, err
+    }
+
+    return u, nil
+}
+
 // GetUserByID retrieves a user by ID.
 func (s *Service) GetUserByID(id string) (*User, error) {
     return s.repo.GetByID(id)
