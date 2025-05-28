@@ -13,6 +13,7 @@ import (
     "github.com/rlee603166/circl/modules/user"
     "github.com/rlee603166/circl/modules/message"
     "github.com/rlee603166/circl/modules/session"
+    "github.com/rlee603166/circl/modules/astralis"
     "github.com/rlee603166/circl/modules/education"
     "github.com/rlee603166/circl/modules/experience"
 
@@ -64,6 +65,7 @@ func main() {
     education.RegisterRoutes(secured, edSvc)
     session.RegisterRoutes(secured, seSvc)
     message.RegisterRoutes(secured, mSvc)
+    astralis.RegisterRoutes(secured)
 
     r.Run(port)
 }
