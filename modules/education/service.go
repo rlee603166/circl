@@ -7,10 +7,13 @@ type Service struct { repo *Repository }
 
 func NewService(r *Repository) *Service { return &Service{r} }
 
-func (s *Service) CreateEducation(e *Education) (*Education, error) {
+func (s *Service) CreateEducation(e *CreateEducation) (*Education, error) {
     if e.UserID == "" { return nil, errors.New("user_id required") }
-    if err := s.repo.Create(e); err != nil { return nil, err }
-    return e, nil
+    created, err := s.repo.Create(e); 
+    if err != nil { 
+        return nil, err 
+    }
+    return created, nil
 }
 
 func (s *Service) GetEducationsByUserID(userID string) ([]Education, error) {

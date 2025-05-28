@@ -7,11 +7,23 @@ type Repository struct { db *sqlx.DB }
 
 func NewRepository(db *sqlx.DB) *Repository { return &Repository{db} }
 
-func (r *Repository) Create(e *Experience) error {
-    q := `INSERT INTO experiences (user_id, company_name, job_title, location, start_date, end_date, experience_description)
-          VALUES (:user_id, :company_name, :job_title, :location, :start_date, :end_date, :experience_description)`
-    _, err := r.db.NamedExec(q, e)
-    return err
+func (r *Repository) Create(e *CreateExperience) (*Experience, error) {
+    query := `INSERT INTO experiences (user_id, company_name, job_title, location, start_date, end_date, experience_description)
+              VALUES (:user_id, :company_name, :job_title, :location, :start_date, :end_date, :experience_description)
+              RETURNING experience_id, user_id, company_name, job_title, location, start_date, end_date, experience_description`
+
+    var created Experience 
+    stmt, err := r.db.PrepareNamed(query)
+    if err != nil {
+        return nil, err
+    }
+
+    err = stmt.Get(&created, e)
+    if err != nil {
+        return nil, err
+    }
+
+    return &created, nil
 }
 
 func (r *Repository) GetByUserID(userID string) ([]Experience, error) {

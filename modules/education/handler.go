@@ -10,7 +10,7 @@ import (
 
 func RegisterRoutes(rg *gin.RouterGroup, svc *Service) {
     rg.POST("/users/:id/educations", func(c *gin.Context) {
-        var e Education
+        var e CreateEducation 
         if err := c.ShouldBindJSON(&e); err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
             return

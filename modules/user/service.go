@@ -33,11 +33,12 @@ func (s *Service) CreateUser(u *User) (*User, error) {
     hashed := string(hash)
     u.HashedPassword = &hashed
 
-    if err := s.repo.Create(u); err != nil {
+    created, err := s.repo.Create(u)
+    if err != nil {
         return nil, err
     }
 
-    return u, nil
+    return created, nil
 }
 
 // CreateUser validates input, hashes the password, and stores the user.
@@ -48,11 +49,12 @@ func (s *Service) CreateGoogleUser(u *User) (*User, error) {
 
     u.UserID = uuid.New().String()
 
-    if err := s.repo.Create(u); err != nil {
+    created, err := s.repo.Create(u)
+    if err != nil {
         return nil, err
     }
 
-    return u, nil
+    return created, nil
 }
 
 // GetUserByID retrieves a user by ID.

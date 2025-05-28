@@ -7,11 +7,23 @@ type Repository struct { db *sqlx.DB }
 
 func NewRepository(db *sqlx.DB) *Repository { return &Repository{db} }
 
-func (r *Repository) Create(e *Education) error {
-    q := `INSERT INTO educations (user_id, institution_name, degree_type, degree_name, enrollment_date, graduation_date)
-          VALUES (:user_id, :institution_name, :degree_type, :degree_name, :enrollment_date, :graduation_date)`
-    _, err := r.db.NamedExec(q, e)
-    return err
+func (r *Repository) Create(e *CreateEducation) (*Education, error) {
+    query := `INSERT INTO educations (user_id, institution_name, degree_type, degree_name, enrollment_date, graduation_date)
+          VALUES (:user_id, :institution_name, :degree_type, :degree_name, :enrollment_date, :graduation_date)
+          RETURNING education_id, user_id, institution_name, degree_type, degree_name, enrollment_date, graduation_date`
+
+    var created Education
+    stmt, err := r.db.PrepareNamed(query)
+    if err != nil {
+        return nil, err
+    }
+
+    err = stmt.Get(&created, e)
+    if err != nil {
+        return nil, err
+    }
+
+    return &created, nil
 }
 
 func (r *Repository) GetByUserID(userID string) ([]Education, error) {

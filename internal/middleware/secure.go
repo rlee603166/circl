@@ -25,8 +25,8 @@ func SecureHandler(authSvc *auth.Service) gin.HandlerFunc {
             return
         }
 
-        c.Set("userID", tokenPayload.UserID)
-        c.Set("email", tokenPayload.Email)
+        c.Set("userID", *tokenPayload.UserID)
+        c.Set("email", *tokenPayload.Email)
         c.Next()
     }
 }

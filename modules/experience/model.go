@@ -6,8 +6,18 @@ type Experience struct {
     UserID                string  `json:"user_id" db:"user_id"`
     CompanyName           string  `json:"company_name" db:"company_name"`
     JobTitle              string  `json:"job_title" db:"job_title"`
-    Location              string  `json:"location" db:"location"`
-    StartDate             string  `json:"start_date" db:"start_date"`
+    Location              *string `json:"location,omitempty" db:"location"`
+    StartDate             *string  `json:"start_date" db:"start_date"`
     EndDate               *string `json:"end_date,omitempty" db:"end_date"`
-    ExperienceDescription string  `json:"experience_description" db:"experience_description"`
+    ExperienceDescription *string `json:"experience_description,omitempty" db:"experience_description"`
+}
+
+type CreateExperience struct {
+    UserID                string  `json:"user_id" db:"user_id"`
+    CompanyName           string  `json:"company_name" db:"company_name"`
+    JobTitle              string  `json:"job_title" db:"job_title"`
+    Location              *string `json:"location,omitempty" db:"location"`
+    StartDate             *string  `json:"start_date" db:"start_date"`
+    EndDate               *string `json:"end_date,omitempty" db:"end_date"`
+    ExperienceDescription *string `json:"experience_description,omitempty" db:"experience_description"`
 }

@@ -17,12 +17,23 @@ func NewRepository(db *sqlx.DB) *Repository {
 }
 
 // Create inserts a new user record.
-func (r *Repository) Create(u *User) error {
+func (r *Repository) Create(u *User) (*User, error) {
     query := `INSERT INTO users (user_id, first_name, last_name, email, hashed_password, summary, pfp_url)
-              VALUES (:user_id, :first_name, :last_name, :email, :hashed_password, :summary, :pfp_url)`
-    _, err := r.db.NamedExec(query, u)
+              VALUES (:user_id, :first_name, :last_name, :email, :hashed_password, :summary, :pfp_url)
+              RETURNING user_id, first_name, last_name, email, hashed_password, summary, pfp_url`
 
-    return err
+    var created User
+    stmt, err := r.db.PrepareNamed(query)
+    if err != nil {
+        return nil, err
+    }
+
+    err = stmt.Get(&created, u)
+    if err != nil {
+        return nil, err
+    }
+
+    return &created, nil
 }
 
 // GetByID fetches a user by their ID.
