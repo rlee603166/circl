@@ -10,12 +10,12 @@ import (
     "github.com/rlee603166/circl/internal/middleware"
 
     "github.com/rlee603166/circl/modules/auth"
-    "github.com/rlee603166/circl/modules/user"
-    "github.com/rlee603166/circl/modules/message"
-    "github.com/rlee603166/circl/modules/session"
+    "github.com/rlee603166/circl/modules/users"
+    "github.com/rlee603166/circl/modules/messages"
+    "github.com/rlee603166/circl/modules/sessions"
     "github.com/rlee603166/circl/modules/astralis"
-    "github.com/rlee603166/circl/modules/education"
-    "github.com/rlee603166/circl/modules/experience"
+    "github.com/rlee603166/circl/modules/educations"
+    "github.com/rlee603166/circl/modules/experiences"
 
 )
 
@@ -39,32 +39,32 @@ func main() {
     secured := r.Group("/api/v1", middleware.SecureHandler(authSvc))
 
     // User module
-    uRepo   := user.NewRepository(conn)
-    uSvc    := user.NewService(uRepo)
+    uRepo   := users.NewRepository(conn)
+    uSvc    := users.NewService(uRepo)
 
     // Experience module
-    expRepo := experience.NewRepository(conn)
-    expSvc  := experience.NewService(expRepo)
+    expRepo := experiences.NewRepository(conn)
+    expSvc  := experiences.NewService(expRepo)
 
     // Education module
-    edRepo  := education.NewRepository(conn)
-    edSvc   := education.NewService(edRepo)
+    edRepo  := educations.NewRepository(conn)
+    edSvc   := educations.NewService(edRepo)
 
     // Session module
-    seRepo  := session.NewRepository(conn)
-    seSvc   := session.NewService(seRepo)
+    seRepo  := sessions.NewRepository(conn)
+    seSvc   := sessions.NewService(seRepo)
 
     // Message module
-    mRepo   := message.NewRepository(conn)
-    mSvc    := message.NewService(mRepo)
+    mRepo   := messages.NewRepository(conn)
+    mSvc    := messages.NewService(mRepo)
 
     // Route registration
     auth.RegisterRoutes(r, authSvc, uSvc)
-    user.RegisterRoutes(secured, uSvc)
-    experience.RegisterRoutes(secured, expSvc)
-    education.RegisterRoutes(secured, edSvc)
-    session.RegisterRoutes(secured, seSvc)
-    message.RegisterRoutes(secured, mSvc)
+    users.RegisterRoutes(secured, uSvc)
+    experiences.RegisterRoutes(secured, expSvc)
+    educations.RegisterRoutes(secured, edSvc)
+    sessions.RegisterRoutes(secured, seSvc, mSvc)
+    messages.RegisterRoutes(secured, mSvc)
     astralis.RegisterRoutes(secured)
 
     r.Run(port)

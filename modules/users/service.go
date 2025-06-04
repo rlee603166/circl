@@ -1,5 +1,5 @@
 // modules/user/service.go
-package user
+package users
 
 import (
     "errors"

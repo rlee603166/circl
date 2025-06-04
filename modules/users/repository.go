@@ -1,5 +1,5 @@
 // modules/user/repository.go
-package user
+package users
 
 import (
     "fmt"

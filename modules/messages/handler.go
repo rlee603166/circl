@@ -1,4 +1,4 @@
-package message
+package messages
 
 import (
     "net/http"
@@ -6,7 +6,7 @@ import (
 )
 
 func RegisterRoutes(rg *gin.RouterGroup, svc *Service) {
-    rg.GET("/message", func (c *gin.Context) {
+    rg.GET("/messages", func (c *gin.Context) {
         userID, exists := c.Get("userID")
         if !exists {
             c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})

@@ -1,5 +1,5 @@
 // modules/experience/service.go
-package experience
+package experiences
 
 import "errors"
 

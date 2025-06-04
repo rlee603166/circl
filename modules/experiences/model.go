@@ -1,5 +1,5 @@
 // modules/experience/model.go
-package experience
+package experiences
 
 type Experience struct {
     ExperienceID          int     `json:"experience_id" db:"experience_id"`

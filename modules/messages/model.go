@@ -1,4 +1,4 @@
-package message
+package messages
 
 type Message struct {
     MessageID   int `json:"message_id" db:"message_id"`

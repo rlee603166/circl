@@ -1,5 +1,5 @@
 // modules/education/model.go
-package education
+package educations
 
 type Education struct {
     EducationID     int     `json:"education_id" db:"education_id"`

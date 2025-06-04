@@ -1,5 +1,5 @@
 // modules/experience/repository.go
-package experience
+package experiences
 
 import "github.com/jmoiron/sqlx"
 

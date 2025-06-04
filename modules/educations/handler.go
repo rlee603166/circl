@@ -1,5 +1,5 @@
-// modules/experience/handler.go
-package experience
+// modules/education/handler.go
+package educations
 
 import (
     "net/http"
@@ -9,14 +9,14 @@ import (
 )
 
 func RegisterRoutes(rg *gin.RouterGroup, svc *Service) {
-    rg.POST("/users/:id/experiences", func(c *gin.Context) {
-        var e CreateExperience
+    rg.POST("/users/:id/educations", func(c *gin.Context) {
+        var e CreateEducation 
         if err := c.ShouldBindJSON(&e); err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
             return
         }
         e.UserID = c.Param("id")
-        created, err := svc.CreateExperience(&e)
+        created, err := svc.CreateEducation(&e)
         if err != nil {
             c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
             return
@@ -24,8 +24,8 @@ func RegisterRoutes(rg *gin.RouterGroup, svc *Service) {
         c.JSON(http.StatusCreated, created)
     })
 
-    rg.GET("/users/:id/experiences", func(c *gin.Context) {
-        list, err := svc.GetExperiencesByUserID(c.Param("id"))
+    rg.GET("/users/:id/educations", func(c *gin.Context) {
+        list, err := svc.GetEducationsByUserID(c.Param("id"))
         if err != nil {
             c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
             return
@@ -33,15 +33,15 @@ func RegisterRoutes(rg *gin.RouterGroup, svc *Service) {
         c.JSON(http.StatusOK, list)
     })
 
-    rg.PUT("/experiences/:id", func(c *gin.Context) {
+    rg.PUT("/educations/:id", func(c *gin.Context) {
         id, _ := strconv.Atoi(c.Param("id"))
-        var e Experience
+        var e Education
         if err := c.ShouldBindJSON(&e); err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
             return
         }
-        e.ExperienceID = id
-        updated, err := svc.UpdateExperience(&e)
+        e.EducationID = id
+        updated, err := svc.UpdateEducation(&e)
         if err != nil {
             c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
             return
@@ -49,9 +49,9 @@ func RegisterRoutes(rg *gin.RouterGroup, svc *Service) {
         c.JSON(http.StatusOK, updated)
     })
 
-    rg.DELETE("/experiences/:id", func(c *gin.Context) {
+    rg.DELETE("/educations/:id", func(c *gin.Context) {
         id, _ := strconv.Atoi(c.Param("id"))
-        if err := svc.DeleteExperience(id); err != nil {
+        if err := svc.DeleteEducation(id); err != nil {
             c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
             return
         }

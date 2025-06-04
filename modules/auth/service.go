@@ -8,7 +8,7 @@ import (
  
     "github.com/golang-jwt/jwt/v5"
     "google.golang.org/api/idtoken"
-    "github.com/rlee603166/circl/modules/user"
+    "github.com/rlee603166/circl/modules/users"
 )
 
 type Service struct {
@@ -29,7 +29,7 @@ func GetService() *Service {
     }
 }
 
-func (s *Service) CreateAccessToken(u *user.User) (string, error) {
+func (s *Service) CreateAccessToken(u *users.User) (string, error) {
     token := jwt.NewWithClaims(jwt.SigningMethodHS256,
         jwt.MapClaims{
             "userID": u.UserID,
@@ -45,7 +45,7 @@ func (s *Service) CreateAccessToken(u *user.User) (string, error) {
     return tokenString, nil
 }
 
-func (s *Service) CreateRefreshToken(u *user.User) (string, error) {
+func (s *Service) CreateRefreshToken(u *users.User) (string, error) {
     token := jwt.NewWithClaims(jwt.SigningMethodHS256,
         jwt.MapClaims{
             "userID": u.UserID,

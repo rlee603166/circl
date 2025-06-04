@@ -1,4 +1,4 @@
-package user
+package users
 
 type User struct {
     UserID         string  `json:"user_id" db:"user_id"`

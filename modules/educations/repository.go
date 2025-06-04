@@ -1,5 +1,5 @@
 // modules/education/repository.go
-package education
+package educations
 
 import "github.com/jmoiron/sqlx"
 

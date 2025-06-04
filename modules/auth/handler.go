@@ -6,10 +6,10 @@ import (
     "database/sql"
 
     "github.com/gin-gonic/gin"
-    "github.com/rlee603166/circl/modules/user"
+    "github.com/rlee603166/circl/modules/users"
 )
 
-func RegisterRoutes(r *gin.Engine, authSvc *Service, userSvc *user.Service) {
+func RegisterRoutes(r *gin.Engine, authSvc *Service, userSvc *users.Service) {
     r.POST("/auth/log-in", func (c *gin.Context) {
         var body struct {
             Email       string `json:"email"`
@@ -80,7 +80,7 @@ func RegisterRoutes(r *gin.Engine, authSvc *Service, userSvc *user.Service) {
 
         userInDB, err := userSvc.GetUserByEmail(*authPayload.Email)
         if err == sql.ErrNoRows {
-            newUser := &user.User{
+            newUser := &users.User{
                 FirstName:  authPayload.FirstName,
                 LastName:   authPayload.LastName,
                 Email:      authPayload.Email,

@@ -1,5 +1,5 @@
 // modules/education/service.go
-package education
+package educations
 
 import "errors"
 

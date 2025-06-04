@@ -1,5 +1,5 @@
 // modules/user/handler.go
-package user
+package users
 
 import (
     "net/http"
