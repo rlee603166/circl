@@ -1,6 +1,7 @@
 package auth
 
 import (
+    "fmt"
     "strings"
     "net/http"
     "database/sql"
@@ -27,11 +28,14 @@ func RegisterRoutes(r *gin.Engine, authSvc *Service, userSvc *users.Service) {
             return
         }
 
+        fmt.Printf("→ Found user: %+v\n", *user)
+
         // if user.HashedPassword == nil || bcrypt.CompareHashAndPassword([]byte(*user.HashedPassword), []byte(body.Password)) != nil {
         //     c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
         //     return
         // }
 
+        fmt.Println(user.HashedPassword)
         if user.HashedPassword == nil || *user.HashedPassword != body.Password {
             c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
             return
