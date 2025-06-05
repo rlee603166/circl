@@ -13,7 +13,7 @@ func NewRepository(db *sqlx.DB) *Repository {
 }
 
 func (r *Repository) Create(s *CreateSession) (*Session, error) {
-	query := `INSERT INTO chat_sessions (session_id, user_id, title)
+	query := `INSERT INTO sessions (session_id, user_id, title)
               VALUES (:session_id, :user_id, :title)
               RETURNING session_id, user_id, title, created_at`
 
@@ -33,7 +33,7 @@ func (r *Repository) Create(s *CreateSession) (*Session, error) {
 
 func (r *Repository) GetByID(id string) (*Session, error) {
 	var s Session
-	err := r.db.Get(&s, `SELECT * FROM chat_sessions WHERE session_id=$1`, id)
+	err := r.db.Get(&s, `SELECT * FROM sessions WHERE session_id=$1`, id)
 	if err != nil {
 		return nil, err
 	}
@@ -43,6 +43,6 @@ func (r *Repository) GetByID(id string) (*Session, error) {
 
 func (r *Repository) GetByUserID(userID string) ([]Session, error) {
 	var list []Session
-	err := r.db.Select(&list, `SELECT * FROM chat_sessions WHERE user_id=$1`, userID)
+	err := r.db.Select(&list, `SELECT * FROM sessions WHERE user_id=$1`, userID)
 	return list, err
 }

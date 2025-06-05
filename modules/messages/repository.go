@@ -15,7 +15,7 @@ func NewRepository(db *sqlx.DB) *Repository {
 }
 
 func (r *Repository) Create(m *CreateMessage) (*Message, error) {
-    query := `INSERT INTO chat_messages (session_id, role, content)
+    query := `INSERT INTO session_messages (session_id, role, content)
               VALUES (:message_id, :session_id, :role, :content)
               RETURNING message_id, session_id, session_id, role, content, created_at`
 
@@ -35,7 +35,7 @@ func (r *Repository) Create(m *CreateMessage) (*Message, error) {
 
 func (r *Repository) GetByID(id string) (*Message, error) {
     var m Message 
-    err := r.db.Get(&m, `SELECT * FROM chat_messages WHERE message_id=$1`, id)
+    err := r.db.Get(&m, `SELECT * FROM session_messages WHERE message_id=$1`, id)
     if err != nil {
         return nil, err
     }
@@ -45,12 +45,12 @@ func (r *Repository) GetByID(id string) (*Message, error) {
 
 func (r *Repository) GetByUserID(userID string) ([]Message, error) {
     var list []Message
-    err := r.db.Select(&list, `SELECT * FROM chat_messages WHERE user_id=$1`, userID)
+    err := r.db.Select(&list, `SELECT * FROM session_messages WHERE user_id=$1`, userID)
     return list, err
 }
 
 func (r *Repository) GetBySessionID(sessionID string) ([]Message, error) {
     var list []Message
-    err := r.db.Select(&list, `SELECT * FROM chat_messages WHERE session_id=$1`, sessionID)
+    err := r.db.Select(&list, `SELECT * FROM session_messages WHERE session_id=$1`, sessionID)
     return list, err
 }
